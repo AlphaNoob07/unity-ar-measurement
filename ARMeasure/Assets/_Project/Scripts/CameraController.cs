@@ -1,14 +1,20 @@
 using UnityEngine;
-using System.Collections.Generic;
 using UnityEngine.UI;
+using System.Collections;
+using UnityGoogleDrive;
+using System.Collections.Generic;
+
 public class CameraController : MonoBehaviour
 {
+    public FileUploader m_fileUploader;
     public Measurement m_measurement;
     public RawImage m_rawImage;
     Camera mainCamera;
     public string imagePath = "Assets/CapturedImage.png";
+    Texture2D image;
     private void Start()
     {
+         m_fileUploader = GetComponent<FileUploader>();
          mainCamera = GetComponent<Camera>();
     }
     private void Update()
@@ -36,7 +42,7 @@ public class CameraController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            CaptureImage();
+            StartCoroutine(UploadImageToDrive());
         }
     }
 
@@ -106,7 +112,7 @@ public class CameraController : MonoBehaviour
         RenderTexture.active = null;
 
         // Create a new Texture2D and copy the camera's target texture into it
-        Texture2D image = new Texture2D(rawTexture.width, rawTexture.height);
+        image = new Texture2D(rawTexture.width, rawTexture.height);
         image.SetPixels(rawTexture.GetPixels());
         image.Apply();
 
@@ -115,5 +121,53 @@ public class CameraController : MonoBehaviour
         System.IO.File.WriteAllBytes(imagePath, bytes);
         Debug.Log("Image captured and saved to: " + imagePath);
 
+      //  StartCoroutine(UploadImageToDrive());
+
     }
+
+
+    public void CallFileUpload()
+    {
+        StartCoroutine(UploadImageToDrive());
+    }
+
+    IEnumerator UploadImageToDrive()
+    {
+        // Get the texture from the camera's target texture
+        RenderTexture.active = mainCamera.targetTexture;
+        Texture2D rawTexture = new Texture2D(mainCamera.targetTexture.width, mainCamera.targetTexture.height);
+        rawTexture.ReadPixels(new Rect(0, 0, mainCamera.targetTexture.width, mainCamera.targetTexture.height), 0, 0);
+        rawTexture.Apply();
+        RenderTexture.active = null;
+
+        // Convert the Texture2D to JPEG format
+        byte[] content = rawTexture.EncodeToJPG();
+
+        // Create a File object with the image data
+        var file = new UnityGoogleDrive.Data.File()
+        {
+            Name = "CapturedImage.jpg",
+            Content = content
+        };
+
+        // Upload the file to Google Drive
+        var request = GoogleDriveFiles.Create(file);
+        request.Fields = new List<string> { "id" };
+        yield return request.Send();
+
+        // Check for errors and log the response
+        if (request.IsError)
+        {
+            Debug.LogError("Error uploading file to Google Drive: " + request.ErrorMessage);
+        }
+        else
+        {
+            Debug.Log("File uploaded successfully. ID: " + request.ResponseData.Id);
+            m_fileUploader.UploadDone();
+        }
+    }
+
+ 
+
+
 }
