@@ -23,9 +23,11 @@ public class PlaceARFocus : MonoBehaviour
     public static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
 
     private Vector2 m_Center;
-
+    [SerializeField]
+    private Measurement m_measurement;
     private void Awake()
     {
+        m_measurement = FindObjectOfType<Measurement>();
         m_planeManager = GetComponent<ARPlaneManager>();
         m_RaycastManager = GetComponent<ARRaycastManager>();
         m_Center = new Vector2(Screen.width / 2f, Screen.height / 2f);
@@ -39,10 +41,10 @@ public class PlaceARFocus : MonoBehaviour
             if (spawnedFocus == null)
             {
                 spawnedFocus = Instantiate(m_FocusPrefab, hitPose.position, hitPose.rotation);
-                //if (onPlacedFocus != null)
-                //{
-                //    onPlacedFocus();
-                //}
+
+                if (m_measurement.movePointHint.activeInHierarchy)
+                    m_measurement.movePointHint.SetActive(false);
+                m_measurement.PlacePointHint.SetActive(true);
             }
 
             spawnedFocus.transform.localPosition = hitPose.position;
@@ -58,6 +60,11 @@ public class PlaceARFocus : MonoBehaviour
                 spawnedFocus.transform.GetChild(0).rotation = Quaternion.Euler(Vector3.zero);
             }
 
+        }
+        else
+        {
+            if (!m_measurement.movePointHint.activeInHierarchy)
+                m_measurement.movePointHint.SetActive(true);
         }
     }
 }

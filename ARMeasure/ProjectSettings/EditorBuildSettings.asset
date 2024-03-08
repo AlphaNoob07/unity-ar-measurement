@@ -6,8 +6,19 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Project/Scenes/MeasurementSample.unity
+    path: Assets/_Project/Scenes/MainMenu.unity
+    guid: fc7ca2d335cdb7f41880bfa2ee5c25a6
+  - enabled: 1
+    path: Assets/_Project/Scenes/Measurement.unity
     guid: 77610eaf1346e428592c0dc9cc2163cb
   m_configObjects:
+    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: c390da17eb6d90b439062844f354468a,
+      type: 2}
+    UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 6ec35d060b2e5734c97b83e75914bfb6,
+      type: 2}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 417d773634a87694d8887e1ee57d7a31,
+      type: 2}
     com.unity.xr.arkit.PlayerSettings: {fileID: 11400000, guid: 2d5fb8e61571b4e3897f221189089fd6,
+      type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 5f8453cc1c1d03a429f8a2bf855c8f2f,
       type: 2}
